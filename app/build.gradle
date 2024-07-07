@@ -18,6 +18,8 @@ repositories {
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'org.mindrot:jbcrypt:0.4'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
