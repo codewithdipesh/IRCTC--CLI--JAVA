@@ -3,6 +3,7 @@ package org.example.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.entities.Ticket;
+import org.example.entities.Train;
 import org.example.entities.User;
 import org.example.utils.UserServiceUtil;
 
@@ -14,7 +15,7 @@ import java.util.Optional;
 public class UserBookingService {
     private User user;
     private List<User> userList;
-
+    TrainService trainService = new TrainService();
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public static final String USERS_PATH = "app/src/main/java/org/example/localDb/users.json";
@@ -31,12 +32,19 @@ public class UserBookingService {
         userList = objectMapper.readValue(users, new TypeReference<List<User>>() {} );
         return userList;
     }
-    public Boolean loginUser(){
+    public Boolean loginUser(String name,String password){
+
         Optional<User> foundUser = userList.stream().filter(user1 -> {                    //user input password       //database save hashed Password
-            return user1.getName().equals(user.getName()) && UserServiceUtil.checkPassword(user.getHashepassword() , user1.getHashepassword() );
+            return user1.getName().equals(name) && UserServiceUtil.checkPassword( password, user1.getHashepassword() );
         }).findFirst();
 
-        return foundUser.isPresent();
+         if(foundUser.isPresent()){
+             user = foundUser.get();
+             return Boolean.TRUE;
+         }
+         else{
+             return Boolean.FALSE;
+         }
 
     }
 
@@ -67,11 +75,11 @@ public class UserBookingService {
 
     public boolean fetchBooking(){
         if (user != null) {
-            user.printTickets();
-            return Boolean.TRUE;
-        } else {
-           return Boolean.FALSE;
+            if(user.printTickets()){
+                return Boolean.TRUE;
+            }
         }
+        return Boolean.FALSE;
 
     }
     public boolean cancelBooking(String ticketId) throws IOException{
@@ -89,6 +97,26 @@ public class UserBookingService {
         saveUserListToFile();
 
         return Boolean.TRUE;
+    }
+    public List<Train> getTrains(String source, String Destination) throws IOException {
+
+        return trainService.searchTrains(source,Destination);
+
+    }
+    public boolean bookSeat(String trainId,String source, String destination) throws IOException {
+        if(fetchSeat(trainId) > 0){
+         Ticket bookedTicket = trainService.bookTicket(source,destination,trainId,user.getUUID());
+         System.out.printf(bookedTicket.TicketInfo());
+         List<Ticket> previousTickets = user.getTicketBooked();
+         previousTickets.add(bookedTicket);
+         updateUserInList();
+         return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
+    public Integer fetchSeat(String trainId){
+        return trainService.getAvailableSeats(trainId);
     }
 
 

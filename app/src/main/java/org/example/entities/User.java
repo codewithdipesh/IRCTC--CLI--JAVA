@@ -21,10 +21,15 @@ public class User {
     public String getHashepassword(){ return this.hashepassword; }
     public List<Ticket> getTicketBooked(){ return this.ticketBooked; }
 
-    public void printTickets(){
+    public boolean printTickets(){
+        if(ticketBooked.size() < 1){
+            System.out.println("No Tickets Booked");
+            return Boolean.FALSE;
+        }
         for(int i = 0;i<= ticketBooked.size();i++){
             System.out.println(ticketBooked.get(i).TicketInfo());
         }
+        return Boolean.TRUE;
     }
     public String getUUID(){ return this.UUID; }
 
