@@ -12,6 +12,8 @@ public class Train {
     private Map<String, String> stationTimes;
     private List<String> stations;
 
+
+
     public Train(String trainId,String trainNo,List<List<Integer>> seats,Map<String, String> stationTimes,List<String> stations){
         this.trainId = trainId;
         this.trainNo = trainNo;

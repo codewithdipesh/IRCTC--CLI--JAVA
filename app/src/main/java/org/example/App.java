@@ -21,10 +21,11 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         int option =0;
         UserBookingService userBookingService;
-        try{
+        try {
             userBookingService = new UserBookingService();
-        }catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("There is something wrong");
+              // Add this line
             return;
         }
         while(option!=7){
@@ -84,6 +85,7 @@ public class App {
                     String destinationInput = scanner.next();
 
                    try{
+                       System.out.println("Searching for trains from '" + sourceInput + "' to '" + destinationInput + "'");
                        List<Train> availableTrains = userBookingService.getTrains(sourceInput,destinationInput);
                        if(availableTrains.isEmpty()){
                            System.out.println("No Trains Available");

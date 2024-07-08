@@ -9,13 +9,16 @@ import org.example.utils.UserServiceUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class UserBookingService {
     private User user;
     private List<User> userList;
-    TrainService trainService = new TrainService();
+
+    private TrainService trainService;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public static final String USERS_PATH = "app/src/main/java/org/example/localDb/users.json";
@@ -23,13 +26,19 @@ public class UserBookingService {
     public UserBookingService(User user) throws IOException {
         this.user = user;
         UsersFetching();
+         trainService = new TrainService();
     }
     public UserBookingService()throws IOException{
         UsersFetching();
+         trainService = new TrainService();
     }
-    private List<User> UsersFetching() throws IOException{
+    private List<User> UsersFetching() throws IOException {
         File users = new File(USERS_PATH);
-        userList = objectMapper.readValue(users, new TypeReference<List<User>>() {} );
+        if (!users.exists() || users.length() == 0) {
+            System.out.println("Users file is empty or doesn't exist. Initializing with an empty list.");
+            return new ArrayList<>();
+        }
+        userList = objectMapper.readValue(users, new TypeReference<List<User>>() {});
         return userList;
     }
     public Boolean loginUser(String name,String password){

@@ -9,6 +9,7 @@ import org.example.entities.User;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,15 +20,26 @@ public class TrainService {
     private List<Train> trainList;
 
     ObjectMapper objectMapper = new ObjectMapper();
-    public static final String TRAINS_PATH = "app/src/main/org/example/localDb/trains.json";
+    public static final String TRAINS_PATH = "app/src/main/java/org/example/localDb/trains.json";
     public TrainService() throws IOException {
         File trains = new File(TRAINS_PATH);
-        trainList = objectMapper.readValue(trains, new TypeReference<List<Train>>() {} );
+        if (!trains.exists() || trains.length() == 0) {
+            System.out.println("Trains file is empty or doesn't exist. Initializing with an empty list.");
+            trainList = new ArrayList<>();
+            // Optionally, you can create the file with an empty JSON array:
+            // trains.getParentFile().mkdirs();
+            // objectMapper.writeValue(trains, trainList);
+        } else {
+            trainList = objectMapper.readValue(trains, new TypeReference<List<Train>>() {});
+        }
     }
 
 
-    public List<Train> searchTrains(String source,String Destination){
-        return trainList.stream().filter(t-> validTrain(t,source,Destination)).collect(Collectors.toList());
+    public List<Train> searchTrains(String source, String Destination) {
+        List<Train> result = trainList.stream()
+                .filter(t -> validTrain(t, source, Destination))
+                .collect(Collectors.toList());
+        return result;
     }
 
     public Ticket bookTicket(String source, String destination, String trainId, String userId) throws IOException {
@@ -107,10 +119,11 @@ public class TrainService {
         return count;
 
     }
-    public boolean validTrain(Train train,String source,String Destination){
+    public boolean validTrain(Train train, String source, String Destination) {
         List<String> stationInOrder = train.getStations();
         int sourceIndex = stationInOrder.indexOf(source);
         int destinationIndex = stationInOrder.indexOf(Destination);
-        return sourceIndex != -1 && destinationIndex!= -1 && destinationIndex > sourceIndex;
+        System.out.println("Train " + train.getTrainId() + ": source index = " + sourceIndex + ", destination index = " + destinationIndex);
+        return sourceIndex != -1 && destinationIndex != -1 && destinationIndex > sourceIndex;
     }
 }
